@@ -231,9 +231,11 @@ function Test-WindowsSdkInstalled
 
         foreach($sdkOption in $WindowsSDKOptions)
         {
-            if (!(Test-RegistryPathAndValue -Path $WindowsSDKInstalledRegPath -Value $sdkOption))
+            if (-not (Test-RegistryPathAndValue -Path $WindowsSDKInstalledRegPath -Value $sdkOption))
             {
                 $allRequiredSdkOptionsInstalled = $false
+
+                Write-Error "$sdkOption option not installed."
             }
         }
 
@@ -257,8 +259,20 @@ function Test-WindowsSdkInstalled
                             # Pretty sure we have what we need
                             $retval = $true
                         }
+                        else
+                        {
+                            Write-Error "$umdPath not found."
+                        }
+                    }
+                    else
+                    {
+                        Write-Error "$refpath not found."
                     }
                 }
+            }
+            else
+            {
+                Write-Error "$WindowsSDKRegRootKey not found."
             }
         }
     }
