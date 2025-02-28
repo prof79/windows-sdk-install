@@ -360,7 +360,7 @@ if ($InstallWindowsSDK)
             # Validate if the SDK was properly installed
             if (Test-InstallWindowsSDK)
             {
-                $logLines = (Get-Content "$setupLog") -join '`n'
+                $logLines = (Get-Content "$setupLog") -join [Environment]::NewLine
 
                 Write-Host $logLines
 
