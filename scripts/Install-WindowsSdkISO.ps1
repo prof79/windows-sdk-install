@@ -235,7 +235,7 @@ function Test-WindowsSdkInstalled
             {
                 $allRequiredSdkOptionsInstalled = $false
 
-                Write-Error "$sdkOption option not installed."
+                Write-Host "$sdkOption option not installed."
             }
         }
 
@@ -261,18 +261,18 @@ function Test-WindowsSdkInstalled
                         }
                         else
                         {
-                            Write-Error "$umdPath not found."
+                            Write-Host "$umdPath not found."
                         }
                     }
                     else
                     {
-                        Write-Error "$refpath not found."
+                        Write-Host "$refpath not found."
                     }
                 }
             }
             else
             {
-                Write-Error "$WindowsSDKRegRootKey not found."
+                Write-Host "$WindowsSDKRegRootKey not found."
             }
         }
     }
