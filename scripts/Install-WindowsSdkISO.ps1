@@ -282,9 +282,9 @@ function Test-InstallStrongNameHijack
 
 Write-Host -NoNewline "Checking if Windows SDK $WindowsSDKVersion is installed ... "
 
-$InstallWindowsSDK = Test-InstallWindowsSDK
+$installWindowsSDK = -not Test-InstallWindowsSDK
 
-if ($InstallWindowsSDK)
+if ($installWindowsSDK)
 {
     Write-Host "Installation required"
 }
