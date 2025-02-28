@@ -362,7 +362,9 @@ if ($InstallWindowsSDK)
             {
                 $logLines = (Get-Content "$setupLog") -join '`n'
 
-                throw "Windows SDK $WindowsSDKVersion was not properly installed:`n`n$logLines"
+                Write-Host $logLines
+
+                throw "Windows SDK $WindowsSDKVersion was not properly installed, see log output above."
             }
         }
         else
