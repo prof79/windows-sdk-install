@@ -34,8 +34,9 @@ $PublicKeyTokens = @("31bf3856ad364e35")
 
 if ($buildNumber -notmatch "^\d{5,}$")
 {
-    Write-Host "ERROR: '$buildNumber' doesn't look like a windows build number"
+    Write-Host "ERROR: '$buildNumber' doesn't look like a windows build number."
     Write-Host
+
     Exit 1
 }
 
@@ -66,13 +67,16 @@ function Download-File
         {
             Write-Host
             Write-Warning "Failed to fetch updated file from ${downloadUrl}: $($error[0])"
+
             if (!(Test-Path $downloadDest))
             {
                 if ($retries -gt 0)
                 {
                     Write-Host "$retries retries left, trying download again ..."
+
                     $retries--
-                    start-sleep -Seconds 10
+
+                    Start-Sleep -Seconds 10
                 }
                 else
                 {
@@ -91,7 +95,7 @@ function Download-File
     $downloadDestTemp = $downloadPath;
 
     # Delete and rename to final dest
-    Write-Host "testing $downloadDest"
+    Write-Host "Testing $downloadDest ..."
 
     if (Test-Path $downloadDest)
     {
@@ -100,6 +104,7 @@ function Download-File
     }
 
     Move-Item -Force $downloadDestTemp $downloadDest
+
     Write-Host "Done"
 
     return $downloadDest
@@ -360,7 +365,7 @@ if ($InstallWindowsSDK)
     # TODO Check if zip, exe, iso, etc.
     try
     {
-        Write-Host -NoNewline "Mounting ISO $file..."
+        Write-Host -NoNewline "Mounting ISO $file ..."
 
         Mount-ISO $downloadFile
 
@@ -370,7 +375,7 @@ if ($InstallWindowsSDK)
 
         if (Test-Path $isoDrive)
         {
-            Write-Host -NoNewLine "Installing WinSDK..."
+            Write-Host -NoNewLine "Installing Windows SDK ..."
 
             $setupPath = Join-Path "$isoDrive" "WinSDKSetup.exe"
 
@@ -385,7 +390,11 @@ if ($InstallWindowsSDK)
             {
                 $logLines = (Get-Content "$setupLog") -join [Environment]::NewLine
 
+                Write-Host -Foreground Yellow "$setupLog output follows ..."
+
                 Write-Host $logLines
+
+                Write-Host -Foreground Yellow "End of log output."
 
                 throw "Windows SDK $WindowsSDKVersion was not properly installed, see log output above."
             }
@@ -397,7 +406,7 @@ if ($InstallWindowsSDK)
     }
     finally
     {
-        Write-Host -NoNewline "Dismounting ISO $file..."
+        Write-Host -NoNewline "Dismounting ISO $file ..."
 
         Dismount-ISO $downloadFile
 
@@ -407,7 +416,7 @@ if ($InstallWindowsSDK)
 
 if ($StrongNameHijack)
 {
-    Write-Host -NoNewline "Disabling StrongName for Windows SDK..."
+    Write-Host -NoNewline "Disabling StrongName for Windows SDK ..."
 
     foreach($key in $PublicKeyTokens)
     {
