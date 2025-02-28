@@ -49,10 +49,11 @@ function Download-File
     $downloadDest = Join-Path $outDir $downloadName
     $downloadDestTemp = Join-Path $outDir "$downloadName.tmp"
 
-    Write-Host -NoNewline "Downloading $downloadName..."
+    Write-Host -NoNewline "Downloading $downloadName from $downloadUrl ..."
 
     $retries = 10
     $downloaded = $false
+    
     while (-not $downloaded)
     {
         try
@@ -64,12 +65,12 @@ function Download-File
         catch [System.Net.WebException]
         {
             Write-Host
-            Write-Warning "Failed to fetch updated file from $downloadUrl : $($error[0])"
+            Write-Warning "Failed to fetch updated file from $downloadUrl: $($error[0])"
             if (!(Test-Path $downloadDest))
             {
                 if ($retries -gt 0)
                 {
-                    Write-Host "$retries retries left, trying download again"
+                    Write-Host "$retries retries left, trying download again ..."
                     $retries--
                     start-sleep -Seconds 10
                 }
@@ -80,7 +81,7 @@ function Download-File
             }
             else
             {
-                Write-Warning "$downloadName may be out of date"
+                Write-Warning "$downloadName may be out of date."
             }
         }
     }
@@ -91,6 +92,7 @@ function Download-File
 
     # Delete and rename to final dest
     Write-Host "testing $downloadDest"
+
     if (Test-Path $downloadDest)
     {
         Write-Host "Deleting: $downloadDest"
@@ -139,6 +141,7 @@ function Mount-ISO
     }
 
     $isoDrive = Get-ISODriveLetter $isoPath
+
     Write-Verbose "$isoPath mounted to ${isoDrive}:"
 }
 
@@ -151,6 +154,7 @@ function Dismount-ISO
     if ($isoDrive)
     {
         Write-Verbose "$isoPath dismounted"
+
         Dismount-DiskImage -ImagePath $isoPath | Out-Null
     }
 }
@@ -160,6 +164,7 @@ function Disable-StrongName
     param ([string] $publicKeyToken = "*")
 
     reg ADD "HKLM\SOFTWARE\Microsoft\StrongName\Verification\*,$publicKeyToken" /f | Out-Null
+
     if ($env:PROCESSOR_ARCHITECTURE -eq "AMD64")
     {
         reg ADD "HKLM\SOFTWARE\Wow6432Node\Microsoft\StrongName\Verification\*,$publicKeyToken" /f | Out-Null
@@ -207,6 +212,7 @@ function Test-InstallWindowsSDK
         # A Windows SDK is installed
         # Is an SDK of our version installed with the options we need?
         $allRequiredSdkOptionsInstalled = $true
+
         foreach($sdkOption in $WindowsSDKOptions)
         {
             if (!(Test-RegistryPathAndValue -Path $WindowsSDKInstalledRegPath -Value $sdkOption))
@@ -219,14 +225,17 @@ function Test-InstallWindowsSDK
         {
             # It appears we have what we need. Double check the disk
             $sdkRoot = Get-ItemProperty -Path $WindowsSDKRegPath | Select-Object -ExpandProperty $WindowsSDKRegRootKey
+
             if ($sdkRoot)
             {
                 if (Test-Path $sdkRoot)
                 {
                     $refPath = Join-Path $sdkRoot "References\$WindowsSDKVersion"
+
                     if (Test-Path $refPath)
                     {
                         $umdPath = Join-Path $sdkRoot "UnionMetadata\$WindowsSDKVersion"
+
                         if (Test-Path $umdPath)
                         {
                             # Pretty sure we have what we need
@@ -246,6 +255,7 @@ function Test-InstallStrongNameHijack
     foreach($publicKeyToken in $PublicKeyTokens)
     {
         $key = "$StrongNameRegPath\*,$publicKeyToken"
+
         if (!(Test-Path $key))
         {
             return $true
@@ -255,8 +265,10 @@ function Test-InstallStrongNameHijack
     return $false
 }
 
-Write-Host -NoNewline "Checking for installed Windows SDK $WindowsSDKVersion..."
+Write-Host -NoNewline "Checking if Windows SDK $WindowsSDKVersion is installed ... "
+
 $InstallWindowsSDK = Test-InstallWindowsSDK
+
 if ($InstallWindowsSDK)
 {
     Write-Host "Installation required"
@@ -268,7 +280,8 @@ else
 
 #$StrongNameHijack = $false
 $StrongNameHijack = Test-InstallStrongNameHijack
-Write-Host -NoNewline "Checking if StrongName bypass required..."
+
+Write-Host -NoNewline "Checking if StrongName bypass required ... "
 
 if ($StrongNameHijack)
 {
@@ -284,6 +297,7 @@ if ($StrongNameHijack -or $InstallWindowsSDK)
     if (!(Test-Admin))
     {
         Write-Host
+
         throw "ERROR: Elevation required"
     }
 }
@@ -326,8 +340,11 @@ if ($InstallWindowsSDK)
     $file = "winsdk_$buildNumber.iso"
 
     Write-Verbose "Getting WinSDK from $uri"
+    
     $downloadFile = Download-File $winsdkTempDir $uri $file
+    
     Write-Verbose "File is at $downloadFile"
+    
     $downloadFileItem = Get-Item $downloadFile
     
     # Check to make sure the file is at least 10 MB.
@@ -336,6 +353,7 @@ if ($InstallWindowsSDK)
         Write-Host
         Write-Host "ERROR: Downloaded file doesn't look large enough to be an ISO. The requested version may not be on microsoft.com yet."
         Write-Host
+
         Exit 1
     }
 
@@ -343,7 +361,9 @@ if ($InstallWindowsSDK)
     try
     {
         Write-Host -NoNewline "Mounting ISO $file..."
+
         Mount-ISO $downloadFile
+
         Write-Host "Done"
 
         $isoDrive = Get-ISODriveLetter $downloadFile
@@ -353,8 +373,11 @@ if ($InstallWindowsSDK)
             Write-Host -NoNewLine "Installing WinSDK..."
 
             $setupPath = Join-Path "$isoDrive" "WinSDKSetup.exe"
+
             $setupLog = Join-Path $winsdkTempDir "WinSDKSetup_$buildNumber.log"
+
             Start-Process -Wait $setupPath "/features $WindowsSDKOptions /l $setupLog /q"
+
             Write-Host "Done"
 
             # Validate if the SDK was properly installed
@@ -375,7 +398,9 @@ if ($InstallWindowsSDK)
     finally
     {
         Write-Host -NoNewline "Dismounting ISO $file..."
+
         Dismount-ISO $downloadFile
+
         Write-Host "Done"
     }
 }
