@@ -360,7 +360,9 @@ if ($InstallWindowsSDK)
             # Validate if the SDK was properly installed
             if (Test-InstallWindowsSDK)
             {
-                throw "Windows SDK $WindowsSDKVersion was not properly installed. See $setupLog for details."
+                $logLines = (Get-Content "$setupLog") -join '`n'
+
+                throw "Windows SDK $WindowsSDKVersion was not properly installed:`n`n$logLines"
             }
         }
         else
