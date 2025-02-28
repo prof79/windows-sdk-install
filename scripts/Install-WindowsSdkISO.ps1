@@ -1,26 +1,33 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true, Position=0)]
-    [string]$buildNumber,
+    [string]
+    $buildNumber,
 
     [Parameter(Mandatory=$true, Position=1)]
-    [string]$features
+    [string]
+    $features
 )
 
 # Ensure the error action preference is set to the default for PowerShell3, 'Stop'
 $ErrorActionPreference = 'Stop'
 
-if (-not $IsWindows) {
+if (-not $IsWindows)
+{
     Write-Host "ERROR: this action is only compatible with Windows!"
     Write-Host
+
     Exit 1
 }
 
 # Generate the features array
 $WindowsSDKOptions = $features -split ',' -replace '^\s+|\s+$' | ForEach-Object { "$_" }
-if ($WindowsSDKOptions.Length -le 0) {
+
+if ($WindowsSDKOptions.Length -le 0)
+{
     Write-Host "ERROR: you need to specify one or more features to install!"
     Write-Host
+
     Exit 1
 }
 
@@ -50,7 +57,7 @@ function Download-File
     $downloadDest = Join-Path $outDir $downloadName
     $downloadDestTemp = Join-Path $outDir "$downloadName.tmp"
 
-    Write-Host -NoNewline "Downloading $downloadName from $downloadUrl ..."
+    Write-Host "Downloading $downloadName from $downloadUrl ..."
 
     $retries = 10
     $downloaded = $false
@@ -65,7 +72,6 @@ function Download-File
         }
         catch [System.Net.WebException]
         {
-            Write-Host
             Write-Warning "Failed to fetch updated file from ${downloadUrl}: $($error[0])"
 
             if (!(Test-Path $downloadDest))
@@ -100,6 +106,7 @@ function Download-File
     if (Test-Path $downloadDest)
     {
         Write-Host "Deleting: $downloadDest"
+
         Remove-Item $downloadDest -Force
     }
 
@@ -390,7 +397,7 @@ if ($InstallWindowsSDK)
             {
                 $logLines = (Get-Content "$setupLog") -join [Environment]::NewLine
 
-                Write-Host -Foreground Yellow "$setupLog output follows ..."
+                Write-Host -Foreground Yellow "Output of $setupLog follows ..."
 
                 Write-Host $logLines
 
@@ -406,7 +413,7 @@ if ($InstallWindowsSDK)
     }
     finally
     {
-        Write-Host -NoNewline "Dismounting ISO $file ..."
+        Write-Host -NoNewline "Dismounting ISO $file ... "
 
         Dismount-ISO $downloadFile
 
@@ -416,7 +423,7 @@ if ($InstallWindowsSDK)
 
 if ($StrongNameHijack)
 {
-    Write-Host -NoNewline "Disabling StrongName for Windows SDK ..."
+    Write-Host -NoNewline "Disabling StrongName for Windows SDK ... "
 
     foreach($key in $PublicKeyTokens)
     {
