@@ -282,7 +282,7 @@ function Test-StrongNameHijackInstalled
 
 Write-Host -NoNewline "Checking if Windows SDK $WindowsSDKVersion is installed ... "
 
-$windowsSdkRequired = -not Test-WindowsSdkInstalled
+$windowsSdkRequired = -not (Test-WindowsSdkInstalled)
 
 if ($windowsSdkRequired)
 {
@@ -398,7 +398,7 @@ if ($windowsSdkRequired)
             Write-Host "Setup done, exit code: $processExitCode"
 
             # Validate if the SDK was properly installed
-            if ($processExitCode -or -not Test-WindowsSdkInstalled)
+            if ($processExitCode -or -not (Test-WindowsSdkInstalled))
             {
                 $logLines = (Get-Content "$setupLog") -join [Environment]::NewLine
 
