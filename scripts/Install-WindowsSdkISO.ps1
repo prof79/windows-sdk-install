@@ -195,10 +195,13 @@ function Test-RegistryPathAndValue
     param (
         [parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string] $path,
+        [string]
+        $path,
         [parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string] $value)
+        [string]
+        $value
+    )
 
     try
     {
@@ -217,7 +220,7 @@ function Test-RegistryPathAndValue
 
 function Test-InstallWindowsSDK
 {
-    $retval = $true
+    $retval = $false
 
     if (Test-RegistryPathAndValue -Path $WindowsSDKRegPath -Value $WindowsSDKRegRootKey)
     {
@@ -233,7 +236,7 @@ function Test-InstallWindowsSDK
             }
         }
 
-        if($allRequiredSdkOptionsInstalled)
+        if ($allRequiredSdkOptionsInstalled)
         {
             # It appears we have what we need. Double check the disk
             $sdkRoot = Get-ItemProperty -Path $WindowsSDKRegPath | Select-Object -ExpandProperty $WindowsSDKRegRootKey
@@ -251,7 +254,7 @@ function Test-InstallWindowsSDK
                         if (Test-Path $umdPath)
                         {
                             # Pretty sure we have what we need
-                            $retval = $false
+                            $retval = $true
                         }
                     }
                 }
@@ -264,11 +267,11 @@ function Test-InstallWindowsSDK
 
 function Test-InstallStrongNameHijack
 {
-    foreach($publicKeyToken in $PublicKeyTokens)
+    foreach ($publicKeyToken in $PublicKeyTokens)
     {
         $key = "$StrongNameRegPath\*,$publicKeyToken"
 
-        if (!(Test-Path $key))
+        if (-not (Test-Path $key))
         {
             return $true
         }
@@ -306,7 +309,7 @@ else
 
 if ($StrongNameHijack -or $InstallWindowsSDK)
 {
-    if (!(Test-Admin))
+    if (-not (Test-Admin))
     {
         Write-Host
 
@@ -344,7 +347,7 @@ if ($InstallWindowsSDK)
 
     $winsdkTempDir = Join-Path (Join-Path $env:TEMP ([System.IO.Path]::GetRandomFileName())) "WindowsSDK"
 
-    if (![System.IO.Directory]::Exists($winsdkTempDir))
+    if (-not [System.IO.Directory]::Exists($winsdkTempDir))
     {
         [void][System.IO.Directory]::CreateDirectory($winsdkTempDir)
     }
@@ -393,7 +396,7 @@ if ($InstallWindowsSDK)
             Write-Host "Done"
 
             # Validate if the SDK was properly installed
-            if (Test-InstallWindowsSDK)
+            if (-not Test-InstallWindowsSDK)
             {
                 $logLines = (Get-Content "$setupLog") -join [Environment]::NewLine
 
@@ -425,7 +428,7 @@ if ($StrongNameHijack)
 {
     Write-Host -NoNewline "Disabling StrongName for Windows SDK ... "
 
-    foreach($key in $PublicKeyTokens)
+    foreach ($key in $PublicKeyTokens)
     {
         Disable-StrongName $key
     }
