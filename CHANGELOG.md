@@ -3,7 +3,7 @@
 ## v1.0.3
 
 - Added a validation to ensure the Windows SDK was properly installed, otherwise throw an error with the log file path for more details
-- Updated the inputs in the README to indicate that the option `OptionId.DesktopCPParm` is no more available in the Windows SDK 26100 and beyound
+- Updated the inputs in the README to indicate that the option `OptionId.DesktopCPParm` is no more available in the Windows SDK 26100 and beyond
 
 ## v1.0.2
 
