@@ -296,7 +296,7 @@ else
 Write-Host -NoNewline "Checking if StrongName bypass required ... "
 
 #$StrongNameHijack = $false
-$strongNameHijackRequired = -not Test-StrongNameHijackInstalled
+$strongNameHijackRequired = -not (Test-StrongNameHijackInstalled)
 
 if ($strongNameHijackRequired)
 {
