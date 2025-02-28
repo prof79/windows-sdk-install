@@ -208,6 +208,7 @@ function Test-RegistryPathAndValue
         if (Test-Path $path)
         {
             Get-ItemProperty -Path $path | Select-Object -ExpandProperty $value -ErrorAction Stop | Out-Null
+
             return $true
         }
     }
@@ -218,7 +219,7 @@ function Test-RegistryPathAndValue
     return $false
 }
 
-function Test-InstallWindowsSDK
+function Test-WindowsSdkInstalled
 {
     $retval = $false
 
@@ -265,26 +266,25 @@ function Test-InstallWindowsSDK
     return $retval
 }
 
-function Test-InstallStrongNameHijack
+function Test-StrongNameHijackInstalled
 {
+    $retval = $true
+
     foreach ($publicKeyToken in $PublicKeyTokens)
     {
         $key = "$StrongNameRegPath\*,$publicKeyToken"
 
-        if (-not (Test-Path $key))
-        {
-            return $true
-        }
+        $retval = $retval -and (Test-Path $key)
     }
 
-    return $false
+    return $retval
 }
 
 Write-Host -NoNewline "Checking if Windows SDK $WindowsSDKVersion is installed ... "
 
-$installWindowsSDK = -not Test-InstallWindowsSDK
+$windowsSdkRequired = -not Test-WindowsSdkInstalled
 
-if ($installWindowsSDK)
+if ($windowsSdkRequired)
 {
     Write-Host "Installation required"
 }
@@ -293,12 +293,12 @@ else
     Write-Host "INSTALLED"
 }
 
-#$StrongNameHijack = $false
-$StrongNameHijack = Test-InstallStrongNameHijack
-
 Write-Host -NoNewline "Checking if StrongName bypass required ... "
 
-if ($StrongNameHijack)
+#$StrongNameHijack = $false
+$strongNameHijackRequired = -not Test-StrongNameHijackInstalled
+
+if ($strongNameHijackRequired)
 {
     Write-Host "REQUIRED"
 }
@@ -307,7 +307,7 @@ else
     Write-Host "Done"
 }
 
-if ($StrongNameHijack -or $InstallWindowsSDK)
+if ($strongNameHijackRequired -or $windowsSdkRequired)
 {
     if (-not (Test-Admin))
     {
@@ -317,7 +317,7 @@ if ($StrongNameHijack -or $InstallWindowsSDK)
     }
 }
 
-if ($InstallWindowsSDK)
+if ($windowsSdkRequired)
 {
     # Static(ish) link for Windows SDK
     # Note: there is a delay from Windows SDK announcements to availability via the static link
@@ -396,7 +396,7 @@ if ($InstallWindowsSDK)
             Write-Host "Done"
 
             # Validate if the SDK was properly installed
-            if (-not Test-InstallWindowsSDK)
+            if (-not Test-WindowsSdkInstalled)
             {
                 $logLines = (Get-Content "$setupLog") -join [Environment]::NewLine
 
@@ -424,7 +424,7 @@ if ($InstallWindowsSDK)
     }
 }
 
-if ($StrongNameHijack)
+if ($strongNameHijackRequired)
 {
     Write-Host -NoNewline "Disabling StrongName for Windows SDK ... "
 
