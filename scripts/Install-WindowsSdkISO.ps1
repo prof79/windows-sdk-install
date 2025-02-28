@@ -389,7 +389,7 @@ if ($windowsSdkRequired)
     # TODO Check if zip, exe, iso, etc.
     try
     {
-        Write-Host -NoNewline "Mounting ISO $file ..."
+        Write-Host -NoNewline "Mounting ISO $file ... "
 
         Mount-ISO $downloadFile
 
