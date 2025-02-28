@@ -40,7 +40,7 @@ The available features of the Windows 10/11 SDK are:
 
 <!-- start usage -->
 ```yaml
-- uses: ChristopheLav/windows-sdk-install@v1
+- uses: prof79/windows-sdk-install@latest
   with:
     version-sdk: 26100
     features: 'OptionId.UWPCPP,OptionId.DesktopCPParm64'
