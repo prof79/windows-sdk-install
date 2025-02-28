@@ -385,7 +385,7 @@ if ($windowsSdkRequired)
 
         if (Test-Path $isoDrive)
         {
-            Write-Host -NoNewLine "Installing Windows SDK ..."
+            Write-Host "Installing Windows SDK ..."
 
             $setupPath = Join-Path "$isoDrive" "WinSDKSetup.exe"
 
@@ -393,10 +393,12 @@ if ($windowsSdkRequired)
 
             Start-Process -Wait $setupPath "/features $WindowsSDKOptions /l $setupLog /q"
 
-            Write-Host "Done"
+            $processExitCode = $LastExitCode
+
+            Write-Host "Setup done, exit code: $processExitCode"
 
             # Validate if the SDK was properly installed
-            if (-not Test-WindowsSdkInstalled)
+            if ($processExitCode -or -not Test-WindowsSdkInstalled)
             {
                 $logLines = (Get-Content "$setupLog") -join [Environment]::NewLine
 
