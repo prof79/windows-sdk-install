@@ -65,7 +65,7 @@ function Download-File
         catch [System.Net.WebException]
         {
             Write-Host
-            Write-Warning "Failed to fetch updated file from $downloadUrl: $($error[0])"
+            Write-Warning "Failed to fetch updated file from ${downloadUrl}: $($error[0])"
             if (!(Test-Path $downloadDest))
             {
                 if ($retries -gt 0)
