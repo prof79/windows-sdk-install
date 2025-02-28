@@ -294,17 +294,17 @@ function Test-StrongNameHijackInstalled
     return $retval
 }
 
-Write-Host -NoNewline "Checking if Windows SDK $WindowsSDKVersion is installed ... "
+Write-Host "Checking if Windows SDK $WindowsSDKVersion is installed ..."
 
 $windowsSdkRequired = -not (Test-WindowsSdkInstalled)
 
 if ($windowsSdkRequired)
 {
-    Write-Host "Installation required"
+    Write-Host "... INSTALLATION REQUIRED"
 }
 else
 {
-    Write-Host "INSTALLED"
+    Write-Host "... INSTALLED"
 }
 
 Write-Host -NoNewline "Checking if StrongName bypass required ... "
