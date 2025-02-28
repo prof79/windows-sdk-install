@@ -391,9 +391,9 @@ if ($windowsSdkRequired)
 
             $setupLog = Join-Path $winsdkTempDir "WinSDKSetup_$buildNumber.log"
 
-            Start-Process -Wait $setupPath "/features $WindowsSDKOptions /l $setupLog /q"
+            $process = Start-Process -Wait $setupPath "/features $WindowsSDKOptions /l $setupLog /q" -PassThru
 
-            $processExitCode = $LastExitCode
+            $processExitCode = $process.ExitCode
 
             Write-Host "Setup done, exit code: $processExitCode"
 
